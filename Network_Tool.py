@@ -16,20 +16,35 @@ def print_header():
     """Print een mooie header voor het script."""
     try:
         header = r"""
-    $$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
-    $$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
-    $$$$ \ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
-    $$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
-    $$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
-    $$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
-    $$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
-    \__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
-                                                                                                                  
-                                                                                                                  
-                                                                                                                  """
+$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
+$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
+$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
+$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
+$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
+$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
+$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
+\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
+                                                                                                              
+                                                                                                              
+                                                                                                              """
         print(header)
     except Exception as e:
         print(f"Fout bij het genereren van de header: {e}")
+
+def print_disclaimer():
+    """Print de disclaimer met ASCII-art."""
+    print_header()
+    disclaimer = """
+    Network Scanner Tool - By Dutch Cyber Sec (v1.3)
+
+    A Python script for network scanning, port scanning, OS detection, and additional information gathering.
+
+    This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
+    Use it responsibly and ensure that you have proper authorization before scanning any network or system.
+
+    DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
+    """
+    print(disclaimer)
 
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
