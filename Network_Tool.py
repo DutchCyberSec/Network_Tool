@@ -9,21 +9,23 @@ import os
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
 def print_header():
     """Print een mooie header voor het script."""
     header = r"""
-$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
-$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
-$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
-$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
-$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
-$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
-$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
-\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
-                                                                                                              
-                                                                                                              
-                                                                                                              """
+    $$\   $$\            $$\                                       $$\             
+    $$$\  $$ |           $$ |                                      $$ |            
+    $$$$ \ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\       
+    $$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |      
+    $$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /      
+    $$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<       
+    $$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\      
+    \__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|     
+                                                                                
+                                                                                
+                                                                                """
     return header
+
 
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
@@ -40,6 +42,7 @@ def print_disclaimer():
     """
     print(header + disclaimer)
 
+
 def get_ip_info(domain):
     """Haal IP-informatie op voor het opgegeven domein."""
     try:
@@ -50,18 +53,19 @@ def get_ip_info(domain):
     except socket.gaierror:
         print(f"Kan geen IP-adressen vinden voor {domain}")
 
+
 def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
     nm = nmap.PortScanner()
     nm.scan(hosts=host, arguments=f'-p {ports} -O' if intense else '-p 1-1024 -O')
-    print(disclaimer)
+    print_disclaimer()
     # Toon open poorten
     for proto in nm[host].all_protocols():
         print(f"\n{proto.upper()} poorten voor {host}:")
         ports = nm[host][proto].keys()
         for port in ports:
             print(f"Poort {port}: {nm[host][proto][port]['state']}")
-            
+
             # Voer banner grabbing uit voor bekende services
             if nm[host][proto][port]['state'] == 'open':
                 if port == 80 or port == 443:
@@ -75,9 +79,10 @@ def scan_ports(host, ports, intense):
         print(f"\nBesturingssysteeminformatie voor {host}:")
         for os_class in os_info:
             print(f"Type: {os_class['osfamily']}, Vendor: {os_class['vendor']}, OS Gen: {os_class['osgen']}")
-            
+
     # Voer DNS-query uit voor extra informatie
     get_ip_info(host)
+
 
 def scan_active_hosts(active_hosts, intense):
     """Scan actieve hosts."""
@@ -92,11 +97,13 @@ def scan_active_hosts(active_hosts, intense):
     for thread in threads:
         thread.join()
 
+
 def print_active_hosts(active_hosts):
     """Druk informatie af over de actieve hosts."""
     print("\nActieve hosts:")
     for host in active_hosts:
         print(host)
+
 
 def check_for_update():
     """Controleer op updates op GitHub en installeer deze automatisch."""
@@ -118,6 +125,7 @@ def check_for_update():
     except Exception as e:
         print(f"Fout bij het controleren op updates: {e}")
 
+
 def contact_menu():
     """Menu voor contactinformatie."""
     print("\n--- Contact Menu ---")
@@ -132,6 +140,7 @@ def contact_menu():
         return
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
+
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -156,20 +165,21 @@ def main_menu():
         else:
             print("\nOngeldige keuze. Probeer opnieuw.")
 
+
 def run_scan_menu():
     """Menu voor het uitvoeren van de scan."""
     print_disclaimer()
     target = input("\nVoer het doel-IP-adres, het IP-bereik, of de domeinnaam in: ")
     intense_scan = input("Wil je een intensieve scan uitvoeren? (ja/nee): ").lower() == 'ja'
-    
+
     nm = nmap.PortScanner()
-    
+
     # Voer een ping-scan uit om actieve hosts te detecteren
     nm.scan(hosts=target, arguments='-sn')
-    
+
     # Lijst met actieve hosts
     active_hosts = [x for x in nm.all_hosts() if nm[x]['status']['state'] == 'up']
-    
+
     # Druk de header en disclaimer af
     print_disclaimer()
 
@@ -179,6 +189,7 @@ def run_scan_menu():
 
     print_active_hosts(active_hosts)
     scan_active_hosts(active_hosts, intense_scan)
+
 
 if __name__ == "__main__":
     print_header()
