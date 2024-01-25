@@ -9,8 +9,8 @@ import os
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-# Definieer de scriptversie
-__version__ = "1.6"
+# Versie van het script
+__version__ = "1.7"
 
 def print_header():
     """Print een mooie header voor het script."""
@@ -31,8 +31,8 @@ $$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\        
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
     header = print_header()
-    disclaimer = """
-Network Scanner Tool - By Dutch Cyber Sec
+    disclaimer = f"""
+Network Scanner Tool v{__version__} - By Dutch Cyber Sec
 
 A Python script for network scanning, port scanning, OS detection, and additional information gathering.
 
@@ -40,6 +40,10 @@ This script is created by Dutch Cyber Sec for educational and ethical hacking pu
 Use it responsibly and ensure that you have proper authorization before scanning any network or system.
 
 DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
+
+UPDATE: This tool has an automatic update feature. You can check for updates and install them from the script. The author is not responsible for any issues that may arise from updating or using outdated versions of the script.
+
+GitHub Repository: https://github.com/DutchCyberSec/Network_Tool
 """
     print(header + disclaimer)
 
@@ -136,39 +140,16 @@ def contact_menu():
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
 
-def whois_menu():
-    """Menu voor Whois-opties."""
-    print("\n--- Whois Menu ---")
-    print("1. Voer Whois uit op een domein")
-    print("2. Terug naar hoofdmenu")
-
-    choice = input("\nSelecteer een optie (1/2): ")
-    if choice == '1':
-        domain = input("Voer het domein in: ")
-        # Voer Whois uit
-        subprocess.run(['whois', domain])
-    elif choice == '2':
-        return
-    else:
-        print("\nOngeldige keuze. Probeer opnieuw.")
-
-def print_version_info():
-    """Druk scriptversie en GitHub-versie-informatie af."""
-    script_content = ""
+def version_menu():
+    """Menu voor het weergeven van de versie-informatie."""
+    print(f"\nHuidige scriptversie: {__version__}")
     try:
-        with open(os.path.basename(__file__), 'r') as current_file:
-            script_content = current_file.read()
-        
-        current_version = [line for line in script_content.split('\n') if '__version__' in line][0]
-        print(f"Huidige scriptversie: {current_version}")
-
         response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
-        latest_script = response.text
-        latest_version = [line for line in latest_script.split('\n') if '__version__' in line][0]
+        script_content = response.text
+        latest_version = [line for line in script_content.split('\n') if '__version__' in line][0].split('=')[1].strip(' "')
         print(f"Nieuwste versie op GitHub: {latest_version}")
-
     except Exception as e:
-        print(f"Fout bij het ophalen van versie-informatie: {e}")
+        print(f"ERROR:Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -178,11 +159,10 @@ def main_menu():
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
         print("3. Contactinformatie")
-        print("4. Whois")
-        print("5. Versie-info")
-        print("6. Afsluiten")
+        print("4. Versie-informatie")
+        print("5. Afsluiten")
 
-        choice = input("\nSelecteer een optie (1/2/3/4/5/6): ")
+        choice = input("\nSelecteer een optie (1/2/3/4/5): ")
         if choice == '1':
             run_scan_menu()
         elif choice == '2':
@@ -190,10 +170,8 @@ def main_menu():
         elif choice == '3':
             contact_menu()
         elif choice == '4':
-            whois_menu()
+            version_menu()
         elif choice == '5':
-            print_version_info()
-        elif choice == '6':
             print("\nAfsluiten...")
             break
         else:
