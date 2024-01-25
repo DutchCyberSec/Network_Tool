@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+# Voeg een variabele '__version__' toe om de versie van het script bij te houden
+__version__ = "1.0"  # Vervang dit door de werkelijke versie van je script
+
+
 def get_script_version():
     """Haal de versie van het huidige script op."""
     try:
-        with open(os.path.basename(__file__), 'r') as current_file:
-            script_content = current_file.read()
-            version_line = [line for line in script_content.split('\n') if '__version__' in line][0]
-            version = version_line.split('=')[1].strip().strip('"')
-            return version
+        return __version__
     except Exception as e:
         logger.error(f"Fout bij het ophalen van de scriptversie: {e}")
         return None
