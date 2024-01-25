@@ -46,21 +46,6 @@ def print_disclaimer():
     """
     print(disclaimer)
 
-def print_disclaimer():
-    """Print de disclaimer met ASCII-art."""
-    header = print_header()
-    disclaimer = """
-    Network Scanner Tool - By Dutch Cyber Sec (v1.3)
-
-    A Python script for network scanning, port scanning, OS detection, and additional information gathering.
-
-    This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
-    Use it responsibly and ensure that you have proper authorization before scanning any network or system.
-
-    DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
-    """
-    print(header + disclaimer)
-
 def get_ip_info(domain):
     """Haal IP-informatie op voor het opgegeven domein."""
     try:
@@ -75,7 +60,7 @@ def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
     nm = nmap.PortScanner()
     nm.scan(hosts=host, arguments=f'-p {ports} -O' if intense else '-p 1-1024 -O')
-    print(disclaimer)
+    print_disclaimer()
     # Toon open poorten
     for proto in nm[host].all_protocols():
         print(f"\n{proto.upper()} poorten voor {host}:")
@@ -139,21 +124,6 @@ def check_for_update():
     except Exception as e:
         print(f"Fout bij het controleren op updates: {e}")
 
-def version_info():
-    """Toon de huidige scriptversie en de nieuwste versie op GitHub."""
-    try:
-        response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
-        latest_script_content = response.text
-
-        current_script_version = [line for line in __file__.split('\n') if '__version__' in line][0]
-        latest_script_version = [line for line in latest_script_content.split('\n') if '__version__' in line][0]
-
-        print(f"\nHuidige scriptversie: {current_script_version}")
-        print(f"Nieuwste versie op GitHub: {latest_script_version}")
-
-    except Exception as e:
-        print(f"ERROR: Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
-
 def contact_menu():
     """Menu voor contactinformatie."""
     print("\n--- Contact Menu ---")
@@ -169,6 +139,17 @@ def contact_menu():
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
 
+def version_info():
+    """Toon scriptversie en controleer op updates."""
+    print(f"\nHuidige scriptversie: {__version__}")
+    try:
+        response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
+        latest_script = response.text
+        latest_version = [line for line in latest_script.split('\n') if '__version__' in line][0]
+        print(f"Nieuwste versie op GitHub: {latest_version}")
+    except Exception as e:
+        print(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+
 def main_menu():
     """Hoofdmenu van het script."""
     while True:
@@ -176,8 +157,8 @@ def main_menu():
         print("\n--- Hoofdmenu ---")
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
-        print("3. Versie-informatie")
-        print("4. Contactinformatie")
+        print("3. Contactinformatie")
+        print("4. Versie-info")
         print("5. Afsluiten")
 
         choice = input("\nSelecteer een optie (1/2/3/4/5): ")
@@ -186,9 +167,9 @@ def main_menu():
         elif choice == '2':
             check_for_update()
         elif choice == '3':
-            version_info()
-        elif choice == '4':
             contact_menu()
+        elif choice == '4':
+            version_info()
         elif choice == '5':
             print("\nAfsluiten...")
             break
@@ -220,5 +201,4 @@ def run_scan_menu():
     scan_active_hosts(active_hosts, intense_scan)
 
 if __name__ == "__main__":
-    print_header()
     main_menu()
