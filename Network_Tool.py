@@ -5,6 +5,11 @@ import socket
 import time
 import requests
 import os
+import logging
+
+# Configureer logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -123,7 +128,7 @@ def check_for_update():
             print("\nJe hebt al de nieuwste versie van het script.")
 
     except Exception as e:
-        print(f"Fout bij het controleren op updates: {e}")
+        logger.error(f"Fout bij het controleren op updates: {e}")
 
 
 def contact_menu():
