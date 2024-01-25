@@ -6,48 +6,37 @@ import time
 import requests
 import os
 
-# Versie van het script
-__version__ = "1.4"
-
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+# Voeg je versienummer toe
+__version__ = "1.5"
 
 def print_header():
     """Print een mooie header voor het script."""
-    try:
-        header = r"""
-$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
-$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
-$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
-$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
-$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
-$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
-$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
-\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
-                                                                                                              
-                                                                                                              
-                                                                                                              """
-        print(header)
-    except Exception as e:
-        print(f"Fout bij het genereren van de header: {e}")
-
+    header = r"""
+   ____ _           _   ____                  _
+  / ___| |__   __ _| |_|  _ \ __ _ _ __ ___  (_)___
+ | |   | '_ \ / _` | __| |_) / _` | '__/ __| | / __|
+ | |___| | | | (_| | |_|  __/ (_| | |  \__ \ | \__ \
+  \____|_| |_|\__,_|\__|_|   \__,_|_|  |___/_|_|___/
+    """
+    return header
 
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
-    print_header()
+    header = print_header()
     disclaimer = """
-    Network Scanner Tool - By Dutch Cyber Sec (v1.3)
+    Network Scanner Tool - By Dutch Cyber Sec
 
-    A Python script for network scanning, port scanning, OS detection, and additional information gathering.
+    A Python script for network scanning, port scanning, OS detection, geolocation, and additional information gathering.
 
     This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
     Use it responsibly and ensure that you have proper authorization before scanning any network or system.
 
     DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
     """
-    print(disclaimer)
-
+    print(header + disclaimer)
 
 def get_ip_info(domain):
     """Haal IP-informatie op voor het opgegeven domein."""
@@ -59,12 +48,24 @@ def get_ip_info(domain):
     except socket.gaierror:
         print(f"Kan geen IP-adressen vinden voor {domain}")
 
+def get_geolocation(ip_address):
+    """Haal geolocatie-informatie op voor het opgegeven IP-adres."""
+    try:
+        response = requests.get(f"https://ipinfo.io/{ip_address}/json")
+        data = response.json()
+        print("\nGeolocatie-informatie:")
+        print(f"IP-adres: {data.get('ip')}")
+        print(f"Locatie: {data.get('city')}, {data.get('region')}, {data.get('country')}")
+        print(f"Provider: {data.get('org')}")
+        print(f"Locatie op de kaart: {data.get('loc')}")
+    except Exception as e:
+        print(f"Fout bij het ophalen van geolocatie-informatie: {e}")
 
 def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
     nm = nmap.PortScanner()
     nm.scan(hosts=host, arguments=f'-p {ports} -O' if intense else '-p 1-1024 -O')
-    print_disclaimer()
+    
     # Toon open poorten
     for proto in nm[host].all_protocols():
         print(f"\n{proto.upper()} poorten voor {host}:")
@@ -88,7 +89,9 @@ def scan_ports(host, ports, intense):
             
     # Voer DNS-query uit voor extra informatie
     get_ip_info(host)
-
+    
+    # Haal geolocatie-informatie op
+    get_geolocation(host)
 
 def scan_active_hosts(active_hosts, intense):
     """Scan actieve hosts."""
@@ -103,13 +106,11 @@ def scan_active_hosts(active_hosts, intense):
     for thread in threads:
         thread.join()
 
-
 def print_active_hosts(active_hosts):
     """Druk informatie af over de actieve hosts."""
     print("\nActieve hosts:")
     for host in active_hosts:
         print(host)
-
 
 def check_for_update():
     """Controleer op updates op GitHub en installeer deze automatisch."""
@@ -131,7 +132,6 @@ def check_for_update():
     except Exception as e:
         print(f"Fout bij het controleren op updates: {e}")
 
-
 def contact_menu():
     """Menu voor contactinformatie."""
     print("\n--- Contact Menu ---")
@@ -147,10 +147,10 @@ def contact_menu():
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
 
-
-def version_info():
-    """Toon scriptversie en controleer op updates."""
-    print(f"\nHuidige scriptversie: {__version__}")
+def version_menu():
+    """Menu voor het controleren van de versie."""
+    print("\n--- Versie Menu ---")
+    print(f"Huidige scriptversie: {__version__}")
     try:
         response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
         latest_script = response.text
@@ -158,7 +158,6 @@ def version_info():
         print(f"Nieuwste versie op GitHub: {latest_version}")
     except Exception as e:
         print(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
-
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -168,7 +167,7 @@ def main_menu():
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
         print("3. Contactinformatie")
-        print("4. Versie-info")
+        print("4. Controleer versie")
         print("5. Afsluiten")
 
         choice = input("\nSelecteer een optie (1/2/3/4/5): ")
@@ -179,13 +178,12 @@ def main_menu():
         elif choice == '3':
             contact_menu()
         elif choice == '4':
-            version_info()
+            version_menu()
         elif choice == '5':
             print("\nAfsluiten...")
             break
         else:
             print("\nOngeldige keuze. Probeer opnieuw.")
-
 
 def run_scan_menu():
     """Menu voor het uitvoeren van de scan."""
@@ -211,6 +209,6 @@ def run_scan_menu():
     print_active_hosts(active_hosts)
     scan_active_hosts(active_hosts, intense_scan)
 
-
 if __name__ == "__main__":
+    print_header()
     main_menu()
