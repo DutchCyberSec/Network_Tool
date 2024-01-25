@@ -5,46 +5,38 @@ import socket
 import time
 import requests
 import os
+import whois
+
+# Voeg je versienummer toe
+__version__ = "1.8"
 
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-# Versie van het script
-__version__ = "1.7"
-
 def print_header():
     """Print een mooie header voor het script."""
     header = r"""
-$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
-$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
-$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
-$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
-$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
-$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
-$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
-\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
-                                                                                                              
-                                                                                                              
-                                                                                                              """
+   ____ _           _   ____                  _
+  / ___| |__   __ _| |_|  _ \ __ _ _ __ ___  (_)___
+ | |   | '_ \ / _` | __| |_) / _` | '__/ __| | / __|
+ | |___| | | | (_| | |_|  __/ (_| | |  \__ \ | \__ \
+  \____|_| |_|\__,_|\__|_|   \__,_|_|  |___/_|_|___/
+    """
     return header
 
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
     header = print_header()
-    disclaimer = f"""
-Network Scanner Tool v{__version__} - By Dutch Cyber Sec
+    disclaimer = """
+    Network Scanner Tool - By Dutch Cyber Sec
 
-A Python script for network scanning, port scanning, OS detection, and additional information gathering.
+    A Python script for network scanning, port scanning, OS detection, geolocation, WHOIS, WPS Admin scanning, and additional information gathering.
 
-This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
-Use it responsibly and ensure that you have proper authorization before scanning any network or system.
+    This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
+    Use it responsibly and ensure that you have proper authorization before scanning any network or system.
 
-DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
-
-UPDATE: This tool has an automatic update feature. You can check for updates and install them from the script. The author is not responsible for any issues that may arise from updating or using outdated versions of the script.
-
-GitHub Repository: https://github.com/DutchCyberSec/Network_Tool
-"""
+    DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
+    """
     print(header + disclaimer)
 
 def get_ip_info(domain):
@@ -57,11 +49,39 @@ def get_ip_info(domain):
     except socket.gaierror:
         print(f"Kan geen IP-adressen vinden voor {domain}")
 
+def get_geolocation(ip_address):
+    """Haal geolocatie-informatie op voor het opgegeven IP-adres."""
+    try:
+        response = requests.get(f"https://ipinfo.io/{ip_address}/json")
+        data = response.json()
+        print("\nGeolocatie-informatie:")
+        print(f"IP-adres: {data.get('ip')}")
+        print(f"Locatie: {data.get('city')}, {data.get('region')}, {data.get('country')}")
+        print(f"Provider: {data.get('org')}")
+        print(f"Locatie op de kaart: {data.get('loc')}")
+    except Exception as e:
+        print(f"Fout bij het ophalen van geolocatie-informatie: {e}")
+
+def get_whois_info(domain):
+    """Haal WHOIS-informatie op voor het opgegeven domein."""
+    try:
+        w = whois.whois(domain)
+        print("\nWHOIS-informatie:")
+        print(f"Domeinnaam: {w.domain_name}")
+        print(f"Registrar: {w.registrar}")
+        print(f"Creatiedatum: {w.creation_date}")
+        print(f"Laatste update: {w.last_updated}")
+        print(f"Vervaldatum: {w.expiration_date}")
+        print(f"Naamhouder: {w.name}")
+        print(f"Contact e-mail: {w.email}")
+    except Exception as e:
+        print(f"Fout bij het ophalen van WHOIS-informatie: {e}")
+
 def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
     nm = nmap.PortScanner()
     nm.scan(hosts=host, arguments=f'-p {ports} -O' if intense else '-p 1-1024 -O')
-    print(disclaimer)
+    
     # Toon open poorten
     for proto in nm[host].all_protocols():
         print(f"\n{proto.upper()} poorten voor {host}:")
@@ -85,6 +105,17 @@ def scan_ports(host, ports, intense):
             
     # Voer DNS-query uit voor extra informatie
     get_ip_info(host)
+
+def scan_wps_admin(host):
+    """Scan op WPS Admin."""
+    try:
+        response = requests.get(f"http://{host}/wp-login.php")
+        if response.status_code == 200 and "WordPress" in response.text:
+            print(f"\nWPS Admin-interface gevonden op: http://{host}/wp-login.php")
+        else:
+            print(f"\nGeen WPS Admin-interface gevonden op: http://{host}/wp-login.php")
+    except Exception as e:
+        print(f"Fout bij het scannen op WPS Admin: {e}")
 
 def scan_active_hosts(active_hosts, intense):
     """Scan actieve hosts."""
@@ -141,15 +172,28 @@ def contact_menu():
         print("\nOngeldige keuze. Probeer opnieuw.")
 
 def version_menu():
-    """Menu voor het weergeven van de versie-informatie."""
-    print(f"\nHuidige scriptversie: {__version__}")
+    """Menu voor het controleren van de versie."""
+    print("\n--- Versie Menu ---")
+    print(f"Huidige scriptversie: {__version__}")
     try:
         response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
-        script_content = response.text
-        latest_version = [line for line in script_content.split('\n') if '__version__' in line][0].split('=')[1].strip(' "')
+        latest_script = response.text
+        latest_version = [line for line in latest_script.split('\n') if '__version__' in line][0]
         print(f"Nieuwste versie op GitHub: {latest_version}")
     except Exception as e:
-        print(f"ERROR:Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+        print(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+
+def whois_menu():
+    """Menu voor het uitvoeren van WHOIS."""
+    print_disclaimer()
+    target = input("\nVoer het domein in voor WHOIS: ")
+    get_whois_info(target)
+
+def wps_admin_menu():
+    """Menu voor het uitvoeren van de WPS Admin-scanner."""
+    print_disclaimer()
+    target = input("\nVoer het IP-adres in voor WPS Admin-scanning: ")
+    scan_wps_admin(target)
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -159,10 +203,12 @@ def main_menu():
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
         print("3. Contactinformatie")
-        print("4. Versie-informatie")
-        print("5. Afsluiten")
+        print("4. Controleer versie")
+        print("5. WHOIS-lookup")
+        print("6. WPS Admin-scanner")
+        print("7. Afsluiten")
 
-        choice = input("\nSelecteer een optie (1/2/3/4/5): ")
+        choice = input("\nSelecteer een optie (1/2/3/4/5/6/7): ")
         if choice == '1':
             run_scan_menu()
         elif choice == '2':
@@ -172,6 +218,10 @@ def main_menu():
         elif choice == '4':
             version_menu()
         elif choice == '5':
+            whois_menu()
+        elif choice == '6':
+            wps_admin_menu()
+        elif choice == '7':
             print("\nAfsluiten...")
             break
         else:
