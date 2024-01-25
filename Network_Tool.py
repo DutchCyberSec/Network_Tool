@@ -12,12 +12,17 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def print_header():
     """Print een mooie header voor het script."""
     header = r"""
-   ____ _           _   ____                  _
-  / ___| |__   __ _| |_|  _ \ __ _ _ __ ___  (_)___
- | |   | '_ \ / _` | __| |_) / _` | '__/ __| | / __|
- | |___| | | | (_| | |_|  __/ (_| | |  \__ \ | \__ \
-  \____|_| |_|\__,_|\__|_|   \__,_|_|  |___/_|_|___/
-    """
+$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
+$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
+$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
+$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
+$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
+$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
+$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
+\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
+                                                                                                              
+                                                                                                              
+                                                                                                              """
     return header
 
 def print_disclaimer():
@@ -96,7 +101,7 @@ def print_active_hosts(active_hosts):
 def check_for_update():
     """Controleer op updates op GitHub."""
     try:
-        response = requests.get("https://raw.githubusercontent.com/your_username/your_repository/main/Network_Tool.py")
+        response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
         latest_script = response.text
 
         with open(os.path.basename(__file__), 'r') as current_file:
