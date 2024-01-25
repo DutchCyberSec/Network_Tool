@@ -9,8 +9,8 @@ import os
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-# Voeg je versienummer toe
-__version__ = "1.5"
+# Definieer de scriptversie
+__version__ = "1.6"
 
 def print_header():
     """Print een mooie header voor het script."""
@@ -32,15 +32,15 @@ def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
     header = print_header()
     disclaimer = """
-    Network Scanner Tool - By Dutch Cyber Sec
+Network Scanner Tool - By Dutch Cyber Sec
 
-    A Python script for network scanning, port scanning, OS detection, geolocation, and additional information gathering.
+A Python script for network scanning, port scanning, OS detection, and additional information gathering.
 
-    This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
-    Use it responsibly and ensure that you have proper authorization before scanning any network or system.
+This script is created by Dutch Cyber Sec for educational and ethical hacking purposes.
+Use it responsibly and ensure that you have proper authorization before scanning any network or system.
 
-    DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
-    """
+DISCLAIMER: The use of this tool without proper authorization may violate applicable laws. The author is not responsible for any misuse or damage caused by this script.
+"""
     print(header + disclaimer)
 
 def get_ip_info(domain):
@@ -53,24 +53,11 @@ def get_ip_info(domain):
     except socket.gaierror:
         print(f"Kan geen IP-adressen vinden voor {domain}")
 
-def get_geolocation(ip_address):
-    """Haal geolocatie-informatie op voor het opgegeven IP-adres."""
-    try:
-        response = requests.get(f"https://ipinfo.io/{ip_address}/json")
-        data = response.json()
-        print("\nGeolocatie-informatie:")
-        print(f"IP-adres: {data.get('ip')}")
-        print(f"Locatie: {data.get('city')}, {data.get('region')}, {data.get('country')}")
-        print(f"Provider: {data.get('org')}")
-        print(f"Locatie op de kaart: {data.get('loc')}")
-    except Exception as e:
-        print(f"Fout bij het ophalen van geolocatie-informatie: {e}")
-
 def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
     nm = nmap.PortScanner()
     nm.scan(hosts=host, arguments=f'-p {ports} -O' if intense else '-p 1-1024 -O')
-    
+    print(disclaimer)
     # Toon open poorten
     for proto in nm[host].all_protocols():
         print(f"\n{proto.upper()} poorten voor {host}:")
@@ -94,9 +81,6 @@ def scan_ports(host, ports, intense):
             
     # Voer DNS-query uit voor extra informatie
     get_ip_info(host)
-    
-    # Haal geolocatie-informatie op
-    get_geolocation(host)
 
 def scan_active_hosts(active_hosts, intense):
     """Scan actieve hosts."""
@@ -152,17 +136,39 @@ def contact_menu():
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
 
-def version_menu():
-    """Menu voor het controleren van de versie."""
-    print("\n--- Versie Menu ---")
-    print(f"Huidige scriptversie: {__version__}")
+def whois_menu():
+    """Menu voor Whois-opties."""
+    print("\n--- Whois Menu ---")
+    print("1. Voer Whois uit op een domein")
+    print("2. Terug naar hoofdmenu")
+
+    choice = input("\nSelecteer een optie (1/2): ")
+    if choice == '1':
+        domain = input("Voer het domein in: ")
+        # Voer Whois uit
+        subprocess.run(['whois', domain])
+    elif choice == '2':
+        return
+    else:
+        print("\nOngeldige keuze. Probeer opnieuw.")
+
+def print_version_info():
+    """Druk scriptversie en GitHub-versie-informatie af."""
+    script_content = ""
     try:
+        with open(os.path.basename(__file__), 'r') as current_file:
+            script_content = current_file.read()
+        
+        current_version = [line for line in script_content.split('\n') if '__version__' in line][0]
+        print(f"Huidige scriptversie: {current_version}")
+
         response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
         latest_script = response.text
         latest_version = [line for line in latest_script.split('\n') if '__version__' in line][0]
         print(f"Nieuwste versie op GitHub: {latest_version}")
+
     except Exception as e:
-        print(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+        print(f"Fout bij het ophalen van versie-informatie: {e}")
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -172,10 +178,11 @@ def main_menu():
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
         print("3. Contactinformatie")
-        print("4. Controleer versie")
-        print("5. Afsluiten")
+        print("4. Whois")
+        print("5. Versie-info")
+        print("6. Afsluiten")
 
-        choice = input("\nSelecteer een optie (1/2/3/4/5): ")
+        choice = input("\nSelecteer een optie (1/2/3/4/5/6): ")
         if choice == '1':
             run_scan_menu()
         elif choice == '2':
@@ -183,8 +190,10 @@ def main_menu():
         elif choice == '3':
             contact_menu()
         elif choice == '4':
-            version_menu()
+            whois_menu()
         elif choice == '5':
+            print_version_info()
+        elif choice == '6':
             print("\nAfsluiten...")
             break
         else:
