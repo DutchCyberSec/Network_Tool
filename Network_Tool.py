@@ -12,17 +12,12 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def print_header():
     """Print een mooie header voor het script."""
     header = r"""
-$$\   $$\            $$\                                       $$\             $$$$$$$$\                  $$\ 
-$$$\  $$ |           $$ |                                      $$ |            \__$$  __|                 $$ |
-$$$$\ $$ | $$$$$$\ $$$$$$\   $$\  $$\  $$\  $$$$$$\   $$$$$$\  $$ |  $$\          $$ | $$$$$$\   $$$$$$\  $$ |
-$$ $$\$$ |$$  __$$\\_$$  _|  $$ | $$ | $$ |$$  __$$\ $$  __$$\ $$ | $$  |         $$ |$$  __$$\ $$  __$$\ $$ |
-$$ \$$$$ |$$$$$$$$ | $$ |    $$ | $$ | $$ |$$ /  $$ |$$ |  \__|$$$$$$  /          $$ |$$ /  $$ |$$ /  $$ |$$ |
-$$ |\$$$ |$$   ____| $$ |$$\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$  _$$<           $$ |$$ |  $$ |$$ |  $$ |$$ |
-$$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\          $$ |\$$$$$$  |\$$$$$$  |$$ |
-\__|  \__| \_______|  \____/  \_____\____/  \______/ \__|      \__|  \__|         \__| \______/  \______/ \__|
-                                                                                                              
-                                                                                                              
-                                                                                                              """
+   ____ _           _   ____                  _
+  / ___| |__   __ _| |_|  _ \ __ _ _ __ ___  (_)___
+ | |   | '_ \ / _` | __| |_) / _` | '__/ __| | / __|
+ | |___| | | | (_| | |_|  __/ (_| | |  \__ \ | \__ \
+  \____|_| |_|\__,_|\__|_|   \__,_|_|  |___/_|_|___/
+    """
     return header
 
 def print_disclaimer():
@@ -99,7 +94,7 @@ def print_active_hosts(active_hosts):
         print(host)
 
 def check_for_update():
-    """Controleer op updates op GitHub."""
+    """Controleer op updates op GitHub en installeer deze automatisch."""
     try:
         response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
         latest_script = response.text
@@ -118,6 +113,21 @@ def check_for_update():
     except Exception as e:
         print(f"Fout bij het controleren op updates: {e}")
 
+def contact_menu():
+    """Menu voor contactinformatie."""
+    print("\n--- Contact Menu ---")
+    print("1. Bekijk GitHub-pagina")
+    print("2. Terug naar hoofdmenu")
+
+    choice = input("\nSelecteer een optie (1/2): ")
+    if choice == '1':
+        print("\nBezoek mijn GitHub-pagina voor updates en meer:")
+        print("https://github.com/DutchCyberSec")
+    elif choice == '2':
+        return
+    else:
+        print("\nOngeldige keuze. Probeer opnieuw.")
+
 def main_menu():
     """Hoofdmenu van het script."""
     while True:
@@ -125,14 +135,17 @@ def main_menu():
         print("\n--- Hoofdmenu ---")
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
-        print("3. Afsluiten")
+        print("3. Contactinformatie")
+        print("4. Afsluiten")
 
-        choice = input("\nSelecteer een optie (1/2/3): ")
+        choice = input("\nSelecteer een optie (1/2/3/4): ")
         if choice == '1':
             run_scan_menu()
         elif choice == '2':
             check_for_update()
         elif choice == '3':
+            contact_menu()
+        elif choice == '4':
             print("\nAfsluiten...")
             break
         else:
