@@ -15,6 +15,19 @@ logger = logging.getLogger(__name__)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def get_script_version():
+    """Haal de versie van het huidige script op."""
+    try:
+        with open(os.path.basename(__file__), 'r') as current_file:
+            script_content = current_file.read()
+            version_line = [line for line in script_content.split('\n') if '__version__' in line][0]
+            version = version_line.split('=')[1].strip().strip('"')
+            return version
+    except Exception as e:
+        logger.error(f"Fout bij het ophalen van de scriptversie: {e}")
+        return None
+
+
 def print_header():
     """Print een mooie header voor het script."""
     header = r"""
@@ -131,6 +144,27 @@ def check_for_update():
         logger.error(f"Fout bij het controleren op updates: {e}")
 
 
+def show_version():
+    """Toon de huidige scriptversie en controleer op de nieuwste versie op GitHub."""
+    current_version = get_script_version()
+    if current_version:
+        print(f"\nHuidige scriptversie: {current_version}")
+
+        try:
+            response = requests.get("https://raw.githubusercontent.com/DutchCyberSec/Network_Tool/main/Network_Tool.py")
+            latest_script = response.text
+
+            latest_version_line = [line for line in latest_script.split('\n') if '__version__' in line][0]
+            latest_version = latest_version_line.split('=')[1].strip().strip('"')
+            print(f"Nieuwste versie op GitHub: {latest_version}")
+
+        except Exception as e:
+            logger.error(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+
+    else:
+        print("\nFout bij het ophalen van de scriptversie.")
+
+
 def contact_menu():
     """Menu voor contactinformatie."""
     print("\n--- Contact Menu ---")
@@ -154,17 +188,20 @@ def main_menu():
         print("\n--- Hoofdmenu ---")
         print("1. Uitvoeren scan")
         print("2. Controleer op updates")
-        print("3. Contactinformatie")
-        print("4. Afsluiten")
+        print("3. Toon versie-informatie")
+        print("4. Contactinformatie")
+        print("5. Afsluiten")
 
-        choice = input("\nSelecteer een optie (1/2/3/4): ")
+        choice = input("\nSelecteer een optie (1/2/3/4/5): ")
         if choice == '1':
             run_scan_menu()
         elif choice == '2':
             check_for_update()
         elif choice == '3':
-            contact_menu()
+            show_version()
         elif choice == '4':
+            contact_menu()
+        elif choice == '5':
             print("\nAfsluiten...")
             break
         else:
