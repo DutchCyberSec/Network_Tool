@@ -7,10 +7,11 @@ import requests
 import os
 
 # Versie van het script
-__version__ = "1.3"
+__version__ = "1.4"
 
 # Stel de huidige werkmap in op de map van het script
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 def print_header():
     """Print een mooie header voor het script."""
@@ -31,6 +32,7 @@ $$ | \$$ |\$$$$$$$\  \$$$$  |\$$$$$\$$$$  |\$$$$$$  |$$ |      $$ | \$$\        
     except Exception as e:
         print(f"Fout bij het genereren van de header: {e}")
 
+
 def print_disclaimer():
     """Print de disclaimer met ASCII-art."""
     print_header()
@@ -46,6 +48,7 @@ def print_disclaimer():
     """
     print(disclaimer)
 
+
 def get_ip_info(domain):
     """Haal IP-informatie op voor het opgegeven domein."""
     try:
@@ -55,6 +58,7 @@ def get_ip_info(domain):
             print(ip)
     except socket.gaierror:
         print(f"Kan geen IP-adressen vinden voor {domain}")
+
 
 def scan_ports(host, ports, intense):
     """Voer poortscan uit voor de opgegeven host."""
@@ -85,6 +89,7 @@ def scan_ports(host, ports, intense):
     # Voer DNS-query uit voor extra informatie
     get_ip_info(host)
 
+
 def scan_active_hosts(active_hosts, intense):
     """Scan actieve hosts."""
     # Maak threads voor het scannen van actieve hosts
@@ -98,11 +103,13 @@ def scan_active_hosts(active_hosts, intense):
     for thread in threads:
         thread.join()
 
+
 def print_active_hosts(active_hosts):
     """Druk informatie af over de actieve hosts."""
     print("\nActieve hosts:")
     for host in active_hosts:
         print(host)
+
 
 def check_for_update():
     """Controleer op updates op GitHub en installeer deze automatisch."""
@@ -124,6 +131,7 @@ def check_for_update():
     except Exception as e:
         print(f"Fout bij het controleren op updates: {e}")
 
+
 def contact_menu():
     """Menu voor contactinformatie."""
     print("\n--- Contact Menu ---")
@@ -139,6 +147,7 @@ def contact_menu():
     else:
         print("\nOngeldige keuze. Probeer opnieuw.")
 
+
 def version_info():
     """Toon scriptversie en controleer op updates."""
     print(f"\nHuidige scriptversie: {__version__}")
@@ -149,6 +158,7 @@ def version_info():
         print(f"Nieuwste versie op GitHub: {latest_version}")
     except Exception as e:
         print(f"Fout bij het ophalen van de nieuwste versie op GitHub: {e}")
+
 
 def main_menu():
     """Hoofdmenu van het script."""
@@ -176,6 +186,7 @@ def main_menu():
         else:
             print("\nOngeldige keuze. Probeer opnieuw.")
 
+
 def run_scan_menu():
     """Menu voor het uitvoeren van de scan."""
     print_disclaimer()
@@ -199,6 +210,7 @@ def run_scan_menu():
 
     print_active_hosts(active_hosts)
     scan_active_hosts(active_hosts, intense_scan)
+
 
 if __name__ == "__main__":
     main_menu()
